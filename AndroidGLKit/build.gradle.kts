@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.cj186.easyopengl"
+    namespace = "com.cj186.androidglkit"
     compileSdk = 34
 
     defaultConfig {

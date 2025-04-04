@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.cj186.opengl"
+    namespace = "com.cj186.opengltest"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.cj186.opengl"
+        applicationId = "com.cj186.opengltest"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
