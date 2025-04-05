@@ -2,37 +2,85 @@ package com.cj186.androidglkit;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
+
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.opengl.GLU;
+import android.util.Log;
 
 public class GLRenderManager implements GLSurfaceView.Renderer{
 
-    private Context ctx;   // Application context needed to read image (NEW)
     private Cube cube;
-    private static float angleCube = 0;     // rotational angle in degree for cube
-    private static float speedCube = -1.5f; // rotational speed for cube
 
+    float[] backgroundColorArray;
+    String backgroundColorString;
+
+    private float rotationX = 0f;  // X-axis rotation
+    private float rotationY = 0f;  // Y-axis rotation
+    private float rotationZ = 0f;  // Z-axis rotation
     // Constructor
-    public GLRenderManager(Context ctx) {
-        this.ctx = ctx;   // Get the application context (NEW)
-        int[] images = {R.drawable.die_1, R.drawable.die_2, R.drawable.die_3, R.drawable.die_4, R.drawable.die_5, R.drawable.die_6};
-        cube = new Cube(ctx, images);
+    public GLRenderManager(Context ctx, String backgroundColor, int[] images, float size) {
+        backgroundColorString = backgroundColor;
+        cube = new Cube(ctx, images, size);
+    }
+
+    public void performRotation(int X, int Y){
+        // Setup ObjectAnimator to animate rotations
+        ObjectAnimator resetX = ObjectAnimator.ofFloat(this, "rotationX", 0f, 0);
+        resetX.setDuration(1000); // Duration in milliseconds
+        resetX.start();
+
+        ObjectAnimator resetY = ObjectAnimator.ofFloat(this, "rotationY", 0f, 0);
+        resetY.setDuration(1000);
+        resetY.start();
+
+        ObjectAnimator rotateXAnimator = ObjectAnimator.ofFloat(this, "rotationX", 0f, Y);
+        rotateXAnimator.setDuration(2000); // Duration in milliseconds
+        rotateXAnimator.start();
+
+        ObjectAnimator rotateYAnimator = ObjectAnimator.ofFloat(this, "rotationY", 0f, X);
+        rotateYAnimator.setDuration(2000);
+        rotateYAnimator.start();
+    }
+
+    private void setRotationX(float rotationX) {
+        this.rotationX = rotationX;
+    }
+
+    private void setRotationY(float rotationY) {
+        this.rotationY = rotationY;
+    }
+
+    private void setRotationZ(float rotationZ) {
+        this.rotationZ = rotationZ;
+    }
+
+    public static float[] getRGB(final String rgb) {
+        int r = Integer.parseInt(rgb.substring(0, 2), 16); // 16 for hex
+        int g = Integer.parseInt(rgb.substring(2, 4), 16); // 16 for hex
+        int b = Integer.parseInt(rgb.substring(4, 6), 16); // 16 for hex
+        return new float[] {r, g, b};
     }
 
     @Override
     public void onSurfaceCreated(GL10 gl, EGLConfig eglConfig) {
-        gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  // Set color's clear-value to black
+        backgroundColorArray = getRGB(backgroundColorString);
+        // Convert colors to percentages of 255.
+        backgroundColorArray[0] /= 255.0F;
+        backgroundColorArray[1] /= 255.0F;
+        backgroundColorArray[2] /= 255.0F;
+        gl.glClearColor(backgroundColorArray[0], backgroundColorArray[1], backgroundColorArray[2], 1);
         gl.glClearDepthf(1.0f);            // Set depth's clear-value to farthest
         gl.glEnable(GL10.GL_DEPTH_TEST);   // Enables depth-buffer for hidden surface removal
         gl.glDepthFunc(GL10.GL_LEQUAL);    // The type of depth testing to do
-        gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);  // nice perspective view
+        gl.glHint(GL10.GL_PERSPECTIVE_CORRECTION_HINT, GL10.GL_NICEST);
         gl.glShadeModel(GL10.GL_SMOOTH);   // Enable smooth shading of color
         gl.glDisable(GL10.GL_DITHER);      // Disable dithering for better performance
 
-        // Setup Texture, each time the surface is created (NEW)
-        cube.loadTexture(gl, ctx);    // Load image into Texture (NEW)
-        gl.glEnable(GL10.GL_TEXTURE_2D);  // Enable texture (NEW)
+        // Setup Texture, each time the surface is created
+        cube.loadTexture(gl);    // Load image into Texture
+        gl.glEnable(GL10.GL_TEXTURE_2D);  // Enable texture
     }
 
     @Override
@@ -59,12 +107,11 @@ public class GLRenderManager implements GLSurfaceView.Renderer{
         gl.glClear(GL10.GL_COLOR_BUFFER_BIT | GL10.GL_DEPTH_BUFFER_BIT);
 
         // ----- Render the Cube -----
-        gl.glLoadIdentity();                  // Reset the current model-view matrix
-        gl.glTranslatef(0.0f, 0.0f, -6.0f);   // Translate into the screen
-        gl.glRotatef(angleCube, 0.1f, 1.0f, 0.2f); // Rotate
+        gl.glLoadIdentity();
+        gl.glTranslatef(0.0f, 0.0f, -6.0f);
+        gl.glRotatef(rotationX, 1f, 0f, 0f);
+        gl.glRotatef(rotationY, 0f, 1f, 0f);
+        gl.glRotatef(rotationZ, 0f, 0f, 1f);
         cube.draw(gl);
-
-        // Update the rotational angle after each refresh.
-        angleCube += speedCube;
     }
 }
