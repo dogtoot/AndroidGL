@@ -105,7 +105,7 @@ public class Cube {
         gl.glDisable(GL10.GL_CULL_FACE);
     }
 
-    public void loadTexture(GL10 gl, Context context) {
+    public void loadTexture(GL10 gl) {
         gl.glGenTextures(numFaces, textureIDs, 0); // Generate texture-ID array
 
         for(int face = 0; face < numFaces; face++){
