@@ -8,15 +8,16 @@ import android.opengl.GLU;
 
 public class GLRenderManager implements GLSurfaceView.Renderer{
 
-    private Context context;   // Application context needed to read image (NEW)
+    private Context ctx;   // Application context needed to read image (NEW)
     private Cube cube;
     private static float angleCube = 0;     // rotational angle in degree for cube
     private static float speedCube = -1.5f; // rotational speed for cube
 
     // Constructor
-    public GLRenderManager(Context context) {
-        this.context = context;   // Get the application context (NEW)
-        cube = new Cube();
+    public GLRenderManager(Context ctx) {
+        this.ctx = ctx;   // Get the application context (NEW)
+        int[] images = {R.drawable.die_1, R.drawable.die_2, R.drawable.die_3, R.drawable.die_4, R.drawable.die_5, R.drawable.die_6};
+        cube = new Cube(ctx, images);
     }
 
     @Override
@@ -30,7 +31,7 @@ public class GLRenderManager implements GLSurfaceView.Renderer{
         gl.glDisable(GL10.GL_DITHER);      // Disable dithering for better performance
 
         // Setup Texture, each time the surface is created (NEW)
-        cube.loadTexture(gl, context);    // Load image into Texture (NEW)
+        cube.loadTexture(gl, ctx);    // Load image into Texture (NEW)
         gl.glEnable(GL10.GL_TEXTURE_2D);  // Enable texture (NEW)
     }
 
