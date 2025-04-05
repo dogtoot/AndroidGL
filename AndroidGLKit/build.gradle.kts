@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace = "com.cj186.androidglkit"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         minSdk = 24
