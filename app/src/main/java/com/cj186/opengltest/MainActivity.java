@@ -28,6 +28,6 @@ public class MainActivity extends AppCompatActivity {
         GLRenderManager renderer = new GLRenderManager(this, "DFF2BF", images, 0.75f);
         glView.setRenderer(renderer);
 
-        renderer.performRotation(180, 0);
+        renderer.performRotation(180, 0, 1000);
     }
 }

@@ -25,14 +25,14 @@ public class GLRenderManager implements GLSurfaceView.Renderer{
         cube = new Cube(ctx, images, size);
     }
 
-    public void performRotation(int X, int Y){
+    public void performRotation(int X, int Y, int durationInMs){
         // Setup ObjectAnimator to animate rotations
         ObjectAnimator resetX = ObjectAnimator.ofFloat(this, "rotationX", 0f, 0);
-        resetX.setDuration(1000); // Duration in milliseconds
+        resetX.setDuration(durationInMs); // Duration in milliseconds
         resetX.start();
 
         ObjectAnimator resetY = ObjectAnimator.ofFloat(this, "rotationY", 0f, 0);
-        resetY.setDuration(1000);
+        resetY.setDuration(durationInMs);
         resetY.start();
 
         ObjectAnimator rotateXAnimator = ObjectAnimator.ofFloat(this, "rotationX", 0f, Y);
