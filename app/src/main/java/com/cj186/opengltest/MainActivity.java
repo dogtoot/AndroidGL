@@ -1,11 +1,8 @@
 package com.cj186.opengltest;
 
-import android.animation.ObjectAnimator;
-import android.content.res.TypedArray;
 import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 
-import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AppCompatActivity;
 import com.cj186.androidglkit.*;
 
