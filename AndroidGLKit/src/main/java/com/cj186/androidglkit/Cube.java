@@ -1,91 +1,102 @@
 package com.cj186.androidglkit;
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-import java.nio.FloatBuffer;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLUtils;
 
-import android.content.Context;
+import com.cj186.androidglkit.exceptions.FaceImageMismatchException;
 
-import com.cj186.androidglkit.Exceptions.CubeTooLargeException;
-import com.cj186.androidglkit.Exceptions.FaceImageMismatchException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 
 import javax.microedition.khronos.opengles.GL10;
 
 public class Cube {
-    private FloatBuffer vertexBuffer;
-    private FloatBuffer texBuffer;
 
+    // Buffers for textures and vertices
+    private final FloatBuffer vertexBuffer;
+    private final FloatBuffer texBuffer;
+
+    // Cube size percentage of one.
     float size = 1;
 
-    private float[] vertices = {
+    // Cube vertices
+    private final float[] vertices = {
             -1.0f, -1.0f, 0.0f,
             1.0f, -1.0f, 0.0f,
             -1.0f,  1.0f, 0.0f,
             1.0f,  1.0f, 0.0f
     };
 
-    float[] texCoords = {
+    float[] textureCoordinates = {
             0.0f, 1.0f,
             1.0f, 1.0f,
             0.0f, 0.0f,
             1.0f, 0.0f
     };
 
-    private int numFaces = 6;
-    private int[] imageFileIds;
+    // The number of faces.
+    private final int numFaces = 6;
 
-    private int[] textureIDs = new int[numFaces];
-    private Bitmap[] bitmap = new Bitmap[numFaces];
+    // The texture drawables and the bitmaps they will become.
+    private final int[] textureIDs = new int[numFaces];
+    private final Bitmap[] bitmap = new Bitmap[numFaces];
 
-    public Cube(Context ctx, int[] ids, float size) throws FaceImageMismatchException {
+    public Cube(Context ctx, int[] ids, float size) {
+        this.size = size;
+
         if(ids.length != numFaces){
+            // Make sure we have enough images for our sides.
             throw new FaceImageMismatchException("Amount of images (" + (ids.length) + ") is not equal to number of faces (" + numFaces +  ")");
         }
 
-        if(size > 1){
-            throw new CubeTooLargeException("Size must be between 0 and 1, size inputted was:" + size + ".");
-        }
+        // Set up our vertices byte buffer, with vertices multiplied by four to fit our floats.
+        ByteBuffer verticesByteBuffer = ByteBuffer.allocateDirect(vertices.length * 4);
+        verticesByteBuffer.order(ByteOrder.nativeOrder());
 
-        this.size = size;
-
-        ByteBuffer vbb = ByteBuffer.allocateDirect(vertices.length * 4);
-        vbb.order(ByteOrder.nativeOrder());
-        vertexBuffer = vbb.asFloatBuffer();
+        // Set our float vertices buffer.
+        vertexBuffer = verticesByteBuffer.asFloatBuffer();
         vertexBuffer.put(vertices);
         vertexBuffer.position(0);
 
-        imageFileIds = ids;
+        // Setup texture byte buffer, making space for our six sides.
+        ByteBuffer textureByteBuffer = ByteBuffer.allocateDirect(textureCoordinates.length * 4 * numFaces);
+        textureByteBuffer.order(ByteOrder.nativeOrder());
 
-        ByteBuffer tbb = ByteBuffer.allocateDirect(texCoords.length * 4 * numFaces);
-        tbb.order(ByteOrder.nativeOrder());
-        texBuffer = tbb.asFloatBuffer();
+        // Setup our texture float buffer.
+        texBuffer = textureByteBuffer.asFloatBuffer();
+        // Loop over our faces, to ensure we have texture coordinates for each image.
         for(int i = 0; i < numFaces; i++)
-            texBuffer.put(texCoords);
+            texBuffer.put(textureCoordinates);
         texBuffer.position(0);
 
+        // Turn our drawable images into bitmaps.
         for(int face = 0; face < numFaces; face++){
-            bitmap[face] = BitmapFactory.decodeResource(ctx.getResources(), imageFileIds[face]);
+            bitmap[face] = BitmapFactory.decodeResource(ctx.getResources(), ids[face]);
         }
     }
 
     public void draw(GL10 gl){
         gl.glFrontFace(GL10.GL_CCW);
-        //gl.glEnable(GL10.GL_CULL_FACE);
-        //gl.glCullFace(GL10.GL_BACK);
+        gl.glEnable(GL10.GL_CULL_FACE);
+        gl.glCullFace(GL10.GL_BACK);
 
         gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
         gl.glVertexPointer(3, GL10.GL_FLOAT, 0, vertexBuffer);
         gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
 
+        // Render our faces with a loop to prevent super duper repetitive code.
         for(int face = 0; face < numFaces; face++){
+            // Set our texture coordinate pointer.
             gl.glTexCoordPointer(2, GL10.GL_FLOAT, 0, texBuffer);
             gl.glPushMatrix();
+            // Set the scale and texture of the face.
             gl.glScalef(size, size, size);
             gl.glBindTexture(GL10.GL_TEXTURE_2D, textureIDs[face]);
 
+            // Rotate the face depending on which face it is.
             switch (face) {
                 case 0: // Front face / One on a dice.
                     break;
@@ -105,19 +116,23 @@ public class Cube {
                     gl.glRotatef(90.0f, 1.0f, 0.0f, 0.0f);
                     break;
             }
+            // Move the face to the center.
             gl.glTranslatef(0.0f, 0.0f, 1.0f);
             gl.glDrawArrays(GL10.GL_TRIANGLE_STRIP, 0, 4);
             gl.glPopMatrix();
         }
 
+        // Set the client state.
         gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
         gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
         gl.glDisable(GL10.GL_CULL_FACE);
     }
 
     public void loadTexture(GL10 gl) {
-        gl.glGenTextures(numFaces, textureIDs, 0); // Generate texture-ID array
+        // Generate texture-ID array
+        gl.glGenTextures(numFaces, textureIDs, 0);
 
+        // Loop over our faces and set texture filters and texture ids.
         for(int face = 0; face < numFaces; face++){
             // Bind to texture ID
             // Set up texture filters
