@@ -24,15 +24,15 @@ public class MainActivity extends AppCompatActivity {
                 R.drawable.die_6};
         GLSurfaceView glView = findViewById(R.id.surface_view);
 
-        GLRenderManager renderer = new GLRenderManager(this, "FFF2BF", images, 0.75f);
+        GLRenderManager renderer = new GLRenderManager(this, "DFF2BF", images, 0.75f);
         glView.setRenderer(renderer);
 
         //renderer.performRotation(720, 720, 5000);
 
         renderer.performRotation(
-                180,
-                180,
-                500,
+                360,
+                15,
+                5000,
                 ValueAnimator.RESTART,
                 ValueAnimator.INFINITE,
                 new LinearInterpolator()
