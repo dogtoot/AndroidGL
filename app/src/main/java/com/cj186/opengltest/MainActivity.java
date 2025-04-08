@@ -27,21 +27,19 @@ public class MainActivity extends AppCompatActivity {
         GLRenderManager renderer = new GLRenderManager(this, "DFF2BF", images, 0.75f);
         glView.setRenderer(renderer);
 
-        //renderer.performRotation(720, 720, 5000);
+        renderer.performRotation(720, 720, 5000);
 
         renderer.performRotation(
                 360,
-                15,
+                150,
                 5000,
-                ValueAnimator.RESTART,
-                ValueAnimator.INFINITE,
                 new LinearInterpolator()
         );
 
-        /*ObjectAnimator rotateYAnimator = ObjectAnimator.ofFloat(renderer, "rotationY", 0, 720);
+        ObjectAnimator rotateYAnimator = ObjectAnimator.ofFloat(renderer, "rotationY", 0, 720);
         rotateYAnimator.setDuration(5000);
         rotateYAnimator.setRepeatMode(ValueAnimator.RESTART);
         rotateYAnimator.setRepeatCount(ValueAnimator.INFINITE);
-        rotateYAnimator.start();*/
+        rotateYAnimator.start();
     }
 }

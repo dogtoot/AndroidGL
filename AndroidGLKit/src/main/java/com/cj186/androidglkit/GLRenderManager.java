@@ -27,19 +27,29 @@ public class GLRenderManager implements GLSurfaceView.Renderer{
         cube = new Cube(ctx, images, size);
     }
 
-    public void performRotation(int X, int Y, int durationInMs, int repeatMode, int repeatCount){
+    public void performRotation(float X, float Y, int durationInMs){
         // Set up two object animators for the X and Y axis.
         // Degrees and speed are passed through the method.
         ObjectAnimator rotateXAnimator = ObjectAnimator.ofFloat(this, "rotationX", rotationX, Y);
         rotateXAnimator.setDuration(durationInMs);
-        rotateXAnimator.setRepeatMode(repeatMode);
-        rotateXAnimator.setRepeatCount(repeatCount);
         rotateXAnimator.start();
 
         ObjectAnimator rotateYAnimator = ObjectAnimator.ofFloat(this, "rotationY", rotationY, X);
         rotateYAnimator.setDuration(durationInMs);
-        rotateYAnimator.setRepeatMode(repeatMode);
-        rotateYAnimator.setRepeatCount(repeatCount);
+        rotateYAnimator.start();
+    }
+
+    public void performRotation(float X, float Y, int durationInMs, Interpolator interpolator){
+        // Set up two object animators for the X and Y axis.
+        // Degrees and speed are passed through the method.
+        ObjectAnimator rotateXAnimator = ObjectAnimator.ofFloat(this, "rotationX", rotationX, Y);
+        rotateXAnimator.setDuration(durationInMs);
+        rotateXAnimator.setInterpolator(interpolator);
+        rotateXAnimator.start();
+
+        ObjectAnimator rotateYAnimator = ObjectAnimator.ofFloat(this, "rotationY", rotationY, X);
+        rotateYAnimator.setDuration(durationInMs);
+        rotateYAnimator.setInterpolator(interpolator);
         rotateYAnimator.start();
     }
 
@@ -52,24 +62,6 @@ public class GLRenderManager implements GLSurfaceView.Renderer{
 
         ObjectAnimator rotateYAnimator = ObjectAnimator.ofFloat(this, "rotationY", rotationY, X);
         rotateYAnimator.setDuration(durationInMs);
-        rotateYAnimator.start();
-    }
-
-    public void performRotation(int X, int Y, int durationInMs, int repeatMode, int repeatCount, Interpolator interpolator){
-        // Set up two object animators for the X and Y axis.
-        // Degrees and speed are passed through the method.
-        ObjectAnimator rotateXAnimator = ObjectAnimator.ofFloat(this, "rotationX", rotationX, Y);
-        rotateXAnimator.setDuration(durationInMs);
-        rotateXAnimator.setInterpolator(interpolator);
-        rotateXAnimator.setRepeatMode(repeatMode);
-        rotateXAnimator.setRepeatCount(repeatCount);
-        rotateXAnimator.start();
-
-        ObjectAnimator rotateYAnimator = ObjectAnimator.ofFloat(this, "rotationY", rotationY, X);
-        rotateYAnimator.setDuration(durationInMs);
-        rotateYAnimator.setInterpolator(interpolator);
-        rotateYAnimator.setRepeatMode(repeatMode);
-        rotateYAnimator.setRepeatCount(repeatCount);
         rotateYAnimator.start();
     }
 
@@ -98,6 +90,14 @@ public class GLRenderManager implements GLSurfaceView.Renderer{
 
     private void setRotationZ(float rotationZ) {
         this.rotationZ = rotationZ;
+    }
+
+    /**
+     *
+     * @return X, Y, Z rotation within a float array.
+     */
+    public float[] getRotation(){
+        return new float[] { rotationX, rotationY, rotationZ};
     }
 
     private static float[] getRGB(String rgb) {
